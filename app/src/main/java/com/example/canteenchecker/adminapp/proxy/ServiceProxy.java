@@ -10,7 +10,7 @@ import java.util.Collection;
 public interface ServiceProxy {
     Collection<Canteen> getCanteens(String filter) throws IOException;
 
-    CanteenDetails getCanteen(String canteenId) throws IOException;
+    CanteenDetails getCanteen(String authToken) throws IOException;
 
     ReviewData getReviewsDataForCanteen(String canteenId) throws IOException;
 

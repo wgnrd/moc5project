@@ -4,6 +4,8 @@
     <!-- CanteenActivity -->
     <string name="hint_filter">Filter</string>
     <string name="text_search">Search</string>
+    <string name="text_save">Save</string>
+    <string name="text_cancel">Cancel</string>
 
     <!-- CanteenDetailsActivity -->
     <string name="text_dish">Dish of the day</string>
@@ -16,6 +18,13 @@
     <string name="message_no_call_permission">No permission to make phone call</string>
     <string name="message_call_not_possible">Call not possible</string>
     <string name="message_show_website_not_possible">Showing of website not possible</string>
+    <string name="text_edit_canteen">Edit canteen</string>
+    <string name="hint_canteen_name">Canteen name</string>
+    <string name="hint_canteen_menu">Menu</string>
+    <string name="hint_canteen_menuPrice">Price</string>
+    <string name="hint_canteen_waitingTime">Waiting Time</string>
+    <string name="hint_canteen_website">Website</string>
+    <string name="hint_canteen_phone">Phone</string>
 
     <!-- LoginActivity -->
     <string name="activity_login">Login</string>

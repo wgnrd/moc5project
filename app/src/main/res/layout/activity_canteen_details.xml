@@ -1,12 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/distance_medium">
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TextAppearance.MaterialComponents.Headline4"
+        android:hint="@string/hint_canteen_name"
+        android:id="@+id/edtName"
+        android:inputType="text"
+        android:autofillHints="@string/hint_canteen_name"
+        android:layout_marginBottom="@dimen/distance_large"/>
 
     <TextView
-        android:id="@+id/txvName"
-        style="@style/TextAppearance.MaterialComponents.Headline3"
-        android:text="Hello"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:text="@string/hint_canteen_menu"/>
+
+    <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</FrameLayout>
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_canteen_menu"
+        android:id="@+id/edtMenu"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:id="@+id/edtPrice"
+        android:hint="@string/hint_canteen_menuPrice"
+        android:layout_marginBottom="@dimen/distance_large"/>
+
+
+    <TextView
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_canteen_waitingTime"
+        android:layout_marginEnd="@dimen/distance_medium"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:id="@+id/edtWaitingTime"
+        android:hint="@string/hint_canteen_waitingTime" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textUri"
+        android:id="@+id/edtWeb"
+        android:hint="@string/hint_canteen_website"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:id="@+id/edtPhone"
+        android:hint="@string/hint_canteen_phone"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_cancel"
+            android:layout_marginEnd="@dimen/distance_medium"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_save"/>
+    </LinearLayout>
+</LinearLayout>
