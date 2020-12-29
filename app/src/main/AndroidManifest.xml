@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CanteenAdmin">
-        <activity android:name=".ui.CanteenDetailActivity" android:label="@string/text_edit_canteen">
+        <activity android:name=".ui.CanteenDetailActivity"
+            android:label="@string/text_edit_canteen"
+            >
 
         </activity>
         <activity android:name=".ui.LoginActivity">
@@ -22,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
     </application>
 
 </manifest>
