@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.canteenchecker.adminapp.CanteenAdminApplication;
 import com.example.canteenchecker.adminapp.R;
+import com.example.canteenchecker.adminapp.core.Canteen;
 import com.example.canteenchecker.adminapp.proxy.ServiceProxyFactory;
 
 import java.io.IOException;
@@ -33,6 +34,10 @@ public class LoginActivity extends AppCompatActivity {
     edtPassword = findViewById(R.id.edtPassword);
     btnLogIn = findViewById(R.id.btnLogIn);
 
+
+    if (((CanteenAdminApplication) getApplication()).isAuthenticated()) {
+      // TODO - maybe check if authenticated and throw back to details view
+    }
     btnLogIn.setOnClickListener(this::LoginHandler);
   }
 
@@ -62,11 +67,16 @@ public class LoginActivity extends AppCompatActivity {
         if (s != null) {
         ((CanteenAdminApplication) getApplication()).setAuthenticationToken(s);
         setResult(RESULT_OK);
-        finish();
+        v.getContext().startActivity(
+                CanteenDetailActivity.createIntent(v.getContext(), "1"));
       } else {
         setUIEnabled(true);
         edtPassword.setText(null);
-        Toast.makeText(LoginActivity.this, R.string.message_login_failed, Toast.LENGTH_SHORT).show();
+        Toast.makeText(
+                LoginActivity.this,
+                R.string.message_login_failed,
+                Toast.LENGTH_SHORT)
+              .show();
       }
       }
     }.execute(edtUserName.getText().toString(), edtPassword.getText().toString());
