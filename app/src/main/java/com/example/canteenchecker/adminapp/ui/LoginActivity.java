@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.canteenchecker.adminapp.CanteenAdminApplication;
 import com.example.canteenchecker.adminapp.R;
 import com.example.canteenchecker.adminapp.proxy.ServiceProxyFactory;
 
@@ -59,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
       @Override
       protected void onPostExecute(String s) {
         if (s != null) {
-        // ((CanteenCheckerApplication) getApplication()).setAuthenticationToken(s);
+        ((CanteenAdminApplication) getApplication()).setAuthenticationToken(s);
         setResult(RESULT_OK);
         finish();
       } else {

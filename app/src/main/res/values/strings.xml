@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Canteen Checker</string>
+    <string name="app_name">Canteen Admin</string>
 
     <!-- CanteenActivity -->
     <string name="hint_filter">Filter</string>
