@@ -21,8 +21,7 @@ import retrofit2.http.Query;
 // proxy implementation for API version 1.0
 // https://moc5.projekte.fh-hagenberg.at/CanteenChecker/swagger/index.html
 class ServiceProxyImpl implements ServiceProxy {
-  private static final String SERVICE_BASE_URL = "https://moc5.projekte.fh-hagenberg.at/CanteenChecker/api/";
-  private static final long ARTIFICIAL_DELAY = 0;
+  private static final String SERVICE_BASE_URL = "https://moc5.projekte.fh-hagenberg.at/CanteenChecker/api/admin/";
 
   private final Proxy proxy = new Retrofit.Builder()
           .baseUrl(SERVICE_BASE_URL)
@@ -31,16 +30,9 @@ class ServiceProxyImpl implements ServiceProxy {
           .build()
           .create(Proxy.class);
 
-  private void causeDelay() {
-    try {
-      Thread.sleep(ARTIFICIAL_DELAY);
-    } catch (InterruptedException ignored) {
-    }
-  }
 
   @Override
   public Collection<Canteen> getCanteens(String filter) throws IOException {
-    causeDelay(); // for testing only
     Collection<Proxy_CanteenData> canteens = proxy.getCanteens(filter).execute().body();
     if (canteens == null) {
       return null;
@@ -53,28 +45,24 @@ class ServiceProxyImpl implements ServiceProxy {
   }
 
   @Override
-  public CanteenDetails getCanteen(String canteenId) throws IOException {
-    causeDelay(); // for testing only
-    Proxy_CanteenDetails canteen = proxy.getCanteen(canteenId).execute().body();
+  public CanteenDetails getCanteen(String authToken) throws IOException {
+    Proxy_CanteenDetails canteen = proxy.getCanteen(String.format("Bearer %s", authToken)).execute().body();
     return canteen != null ? canteen.toCanteenDetails() : null;
   }
 
   @Override
   public ReviewData getReviewsDataForCanteen(String canteenId) throws IOException {
-    causeDelay(); // for testing only
     Proxy_CanteenReviewStatistics reviewData = proxy.getReviewStatisticsForCanteen(canteenId).execute().body();
     return reviewData != null ? reviewData.toReviewData() : null;
   }
 
   @Override
   public String authenticate(String userName, String password) throws IOException {
-    causeDelay(); // for testing only
     return proxy.postAuthenticate(userName, password).execute().body();
   }
 
   @Override
   public void createReview(String authToken, String canteenId, int rating, String remark) throws IOException {
-    causeDelay(); // for testing only
     // TODO make bearer token nicer
     proxy.postCanteenReview(String.format("Bearer %s", authToken), canteenId, rating, remark).execute();
   }
@@ -86,14 +74,17 @@ class ServiceProxyImpl implements ServiceProxy {
     @GET("canteens")
     Call<Collection<Proxy_CanteenData>> getCanteens(@Query("name") String name);
 
-    @GET("canteens/{canteenId}")
-    Call<Proxy_CanteenDetails> getCanteen(@Path("canteenId") String canteenId);
+    @GET("canteen")
+    Call<Proxy_CanteenDetails> getCanteen(@Header("Authorization") String authenticationToken);
 
     @GET("canteens/{canteenId}/review-statistics")
     Call<Proxy_CanteenReviewStatistics> getReviewStatisticsForCanteen(@Path("canteenId") String canteenId);
 
     @POST("canteens/{canteenId}/reviews")
-    Call<Void> postCanteenReview(@Header("Authorization") String authenticationToken, @Path("canteenId") String canteenId, @Query("rating") int rating, @Query("remark") String remark);
+    Call<Void> postCanteenReview(@Header("Authorization") String authenticationToken,
+                                 @Path("canteenId") String canteenId,
+                                 @Query("rating") int rating,
+                                 @Query("remark") String remark);
   }
 
   private static class Proxy_CanteenData {
