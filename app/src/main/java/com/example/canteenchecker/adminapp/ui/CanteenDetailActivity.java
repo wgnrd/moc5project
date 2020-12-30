@@ -8,6 +8,7 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -35,9 +36,13 @@ public class CanteenDetailActivity extends AppCompatActivity {
   private static final String TAG = CanteenDetailActivity.class.toString();
   private static final String CANTEEN_ID_KEY = "CanteenId";
   private static final float DEFAULT_MAP_ZOOM_FACTOR = 15;
+  private boolean uiEditable = false;
 
   private CanteenDetails canteen = null;
 
+  private Button btnSave;
+  private Button btnCancel;
+  private Button btnEdit;
   private EditText edtName;
   private EditText edtMenu;
   private EditText edtPrice;
@@ -58,6 +63,38 @@ public class CanteenDetailActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_canteen_details);
 
+    bindUiElements();
+
+    mpfAddress.getMapAsync(googleMap -> {
+      UiSettings uiSettings = googleMap.getUiSettings();
+      uiSettings.setAllGesturesEnabled(false);
+      uiSettings.setZoomControlsEnabled(true);
+    });
+
+    setUiEditable(uiEditable);
+
+    btnEdit.setOnClickListener(v -> {
+      uiEditable = !uiEditable;
+      setUiEditable(uiEditable);
+    });
+
+    btnSave.setOnClickListener(v -> {
+      uiEditable = !uiEditable;
+      saveCanteen();
+      setUiEditable(uiEditable);
+    });
+
+    updateCanteenDetails();
+  }
+
+  private void saveCanteen() {
+
+  }
+
+  private void bindUiElements() {
+    btnEdit = findViewById(R.id.btnEdit);
+    btnCancel = findViewById(R.id.btnCancel);
+    btnSave = findViewById(R.id.btnSave);
     edtName = findViewById(R.id.edtName);
     edtMenu = findViewById(R.id.edtMenu);
     edtPrice = findViewById(R.id.edtPrice);
@@ -67,17 +104,21 @@ public class CanteenDetailActivity extends AppCompatActivity {
     edtAddress = findViewById(R.id.edtAddress);
     mpfAddress = (SupportMapFragment) getSupportFragmentManager()
             .findFragmentById(R.id.mpfMap);
+  }
 
-    mpfAddress.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(GoogleMap googleMap) {
-        UiSettings uiSettings = googleMap.getUiSettings();
-        uiSettings.setAllGesturesEnabled(false);
-        uiSettings.setZoomControlsEnabled(true);
-      }
-    });
+  private void setUiEditable(boolean value) {
+    btnCancel.setEnabled(value);
+    btnSave.setEnabled(value);
 
-    updateCanteenDetails();
+    edtName.setEnabled(value);
+    edtMenu.setEnabled(value);
+    edtPrice.setEnabled(value);
+    edtWaitingTime.setEnabled(value);
+    edtWeb.setEnabled(value);
+    edtPhone.setEnabled(value);
+    edtAddress.setEnabled(value);
+
+
   }
 
   @SuppressLint("StaticFieldLeak")
@@ -89,14 +130,13 @@ public class CanteenDetailActivity extends AppCompatActivity {
       protected CanteenDetails doInBackground(String... strings) {
         try {
           CanteenDetails canteen = ServiceProxyFactory.createProxy().getCanteen(token);
-          Log.e(TAG, String.format("Canteen '%s'.", canteen.getName()));
           return canteen;
         } catch (IOException e) {
           Toast.makeText(
-                CanteenDetailActivity.this,
-                R.string.message_canteen_not_found,
-                Toast.LENGTH_SHORT)
-                .show();
+                  CanteenDetailActivity.this,
+                  R.string.message_canteen_not_found,
+                  Toast.LENGTH_SHORT)
+                  .show();
           finish();
           return null;
         }
@@ -125,6 +165,11 @@ public class CanteenDetailActivity extends AppCompatActivity {
         edtWeb.setText(canteen.getWebsite());
         edtAddress.setText(canteen.getLocation());
 
+        Log.w(TAG, String.format("***************************************************"));
+        updateMapFragment(canteenDetails);
+      }
+
+      private void updateMapFragment(CanteenDetails canteenDetails) {
         new AsyncTask<String, Void, LatLng>() {
           @Override
           protected LatLng doInBackground(String... strings) {
@@ -148,6 +193,8 @@ public class CanteenDetailActivity extends AppCompatActivity {
           protected void onPostExecute(final LatLng latLng) {
             mpfAddress.getMapAsync(googleMap -> {
               googleMap.clear();
+              Log.w(TAG, String.format("Location", latLng));
+
               if (latLng != null) {
                 googleMap.addMarker(new MarkerOptions().position(latLng));
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_MAP_ZOOM_FACTOR));
@@ -157,7 +204,6 @@ public class CanteenDetailActivity extends AppCompatActivity {
             });
           }
         }.execute(canteenDetails.getLocation());
-
       }
     }.execute(token);
   }

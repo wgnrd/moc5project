@@ -6,6 +6,7 @@
     <string name="text_search">Search</string>
     <string name="text_save">Save</string>
     <string name="text_cancel">Cancel</string>
+    <string name="text_edit">Edit</string>
 
     <!-- CanteenDetailsActivity -->
     <string name="text_dish">Dish of the day</string>
