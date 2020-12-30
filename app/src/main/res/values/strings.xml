@@ -26,6 +26,7 @@
     <string name="hint_canteen_waitingTime">Waiting Time</string>
     <string name="hint_canteen_website">Website</string>
     <string name="hint_canteen_phone">Phone</string>
+    <string name="message_update_done">Canteen updated</string>
 
     <!-- LoginActivity -->
     <string name="activity_login">Login</string>

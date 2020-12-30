@@ -48,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     edtPassword.setEnabled(enabled);
   }
 
+
   @SuppressLint("StaticFieldLeak")
   private void LoginHandler(View v) {
     setUIEnabled(false);
@@ -55,11 +56,11 @@ public class LoginActivity extends AppCompatActivity {
       @Override
       protected String doInBackground(String... strings) {
         try {
-        return ServiceProxyFactory.createProxy().authenticate(strings[0], strings[1]);
-      } catch (IOException e) {
-        Log.e(TAG, String.format("Login failed for user name '%s'.", strings[0]), e);
-        return null;
-      }
+          return ServiceProxyFactory.createProxy().authenticate(strings[0], strings[1]);
+        } catch (IOException e) {
+          Log.e(TAG, String.format("Login failed for user name '%s'.", strings[0]), e);
+          return null;
+        }
       }
 
       @Override

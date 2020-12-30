@@ -15,8 +15,8 @@
         <activity android:name=".ui.CanteenDetailActivity"
             android:label="@string/text_edit_canteen"
             >
-
         </activity>
+
         <activity android:name=".ui.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

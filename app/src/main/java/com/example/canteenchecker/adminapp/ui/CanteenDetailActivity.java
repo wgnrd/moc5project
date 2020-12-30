@@ -20,9 +20,6 @@ import com.example.canteenchecker.adminapp.R;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.proxy.ServiceProxyFactory;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
@@ -30,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.List;
 
 public class CanteenDetailActivity extends AppCompatActivity {
@@ -76,11 +74,20 @@ public class CanteenDetailActivity extends AppCompatActivity {
     btnEdit.setOnClickListener(v -> {
       uiEditable = !uiEditable;
       setUiEditable(uiEditable);
+      if (!uiEditable) {
+        updateCanteenDetails();
+      }
     });
 
     btnSave.setOnClickListener(v -> {
-      uiEditable = !uiEditable;
+      uiEditable = false;
       saveCanteen();
+      setUiEditable(uiEditable);
+    });
+
+    btnCancel.setOnClickListener(v -> {
+      uiEditable = false;
+      updateCanteenDetails();
       setUiEditable(uiEditable);
     });
 
@@ -88,6 +95,68 @@ public class CanteenDetailActivity extends AppCompatActivity {
   }
 
   private void saveCanteen() {
+    try {
+      saveCanteenData();
+      saveCanteenDish();
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @SuppressLint("StaticFieldLeak")
+  private void saveCanteenData() {
+    String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
+    new AsyncTask<String, Void, Void>() {
+      @Override
+      protected Void doInBackground(String... strings) {
+        try {
+          ServiceProxyFactory.createProxy().updateCanteen(token, strings[0], strings[3], strings[1], strings[2]);
+        } catch (IOException e) {
+          Log.e(TAG, String.format("Put went wrong %s", e));
+        }
+        return null;
+      }
+
+      @Override
+      protected void onPostExecute(Void aVoid) {
+        updateCanteenDetails();
+        Toast.makeText(
+                CanteenDetailActivity.this,
+                R.string.message_update_done,
+                Toast.LENGTH_SHORT)
+                .show();
+      }
+    }.execute(edtName.getText().toString(),
+            edtWeb.getText().toString(),
+            edtPhone.getText().toString(),
+            edtAddress.getText().toString());
+  }
+
+  @SuppressLint("StaticFieldLeak")
+  private void saveCanteenDish() throws ParseException {
+    String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
+    new AsyncTask<Object, Void, Void>() {
+      @Override
+      protected Void doInBackground(Object... objects) {
+        try {
+          ServiceProxyFactory.createProxy().updateCanteenDish(token, (String) objects[0], (double) objects[1]);
+        } catch (IOException e) {
+          Log.e(TAG, String.format("Something went wrong while saving the menu", e));
+        }
+        return null;
+      }
+
+      @Override
+      protected void onPostExecute(Void aVoid) {
+        updateCanteenDetails();
+        Toast.makeText(
+                CanteenDetailActivity.this,
+                R.string.message_update_done,
+                Toast.LENGTH_SHORT)
+                .show();
+      }
+    }.execute(edtMenu.getText().toString(),
+            NumberFormat.getCurrencyInstance().parse(edtPrice.getText().toString()).doubleValue());
 
   }
 
@@ -117,8 +186,6 @@ public class CanteenDetailActivity extends AppCompatActivity {
     edtWeb.setEnabled(value);
     edtPhone.setEnabled(value);
     edtAddress.setEnabled(value);
-
-
   }
 
   @SuppressLint("StaticFieldLeak")
@@ -147,6 +214,7 @@ public class CanteenDetailActivity extends AppCompatActivity {
         super.onPostExecute(canteenDetails);
         canteen = canteenDetails;
 
+        Log.e(TAG, String.format("Show"));
         if (canteen == null) {
           Toast.makeText(
                   CanteenDetailActivity.this,
@@ -165,7 +233,6 @@ public class CanteenDetailActivity extends AppCompatActivity {
         edtWeb.setText(canteen.getWebsite());
         edtAddress.setText(canteen.getLocation());
 
-        Log.w(TAG, String.format("***************************************************"));
         updateMapFragment(canteenDetails);
       }
 
