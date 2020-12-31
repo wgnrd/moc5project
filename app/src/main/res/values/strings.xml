@@ -6,6 +6,7 @@
     <string name="text_search">Search</string>
     <string name="text_save">Save</string>
     <string name="text_cancel">Cancel</string>
+    <string name="text_edit">Edit</string>
 
     <!-- CanteenDetailsActivity -->
     <string name="text_dish">Dish of the day</string>
@@ -25,6 +26,7 @@
     <string name="hint_canteen_waitingTime">Waiting Time</string>
     <string name="hint_canteen_website">Website</string>
     <string name="hint_canteen_phone">Phone</string>
+    <string name="message_update_done">Canteen updated</string>
 
     <!-- LoginActivity -->
     <string name="activity_login">Login</string>

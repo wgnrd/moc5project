@@ -10,6 +10,13 @@
     android:orientation="vertical"
     android:padding="@dimen/distance_medium">
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnEdit"
+        android:text="@string/text_edit"
+        android:layout_marginBottom="@dimen/distance_small"/>
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,10 +93,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/text_cancel"
+            android:id="@+id/btnCancel"
             android:layout_marginEnd="@dimen/distance_medium"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/btnSave"
             android:text="@string/text_save"/>
     </LinearLayout>
 </LinearLayout>

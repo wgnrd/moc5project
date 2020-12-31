@@ -1,5 +1,7 @@
 package com.example.canteenchecker.adminapp.proxy;
 
+import android.util.Log;
+
 import com.example.canteenchecker.adminapp.core.Canteen;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.core.ReviewData;
@@ -15,6 +17,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -30,18 +33,8 @@ class ServiceProxyImpl implements ServiceProxy {
           .build()
           .create(Proxy.class);
 
-
-  @Override
-  public Collection<Canteen> getCanteens(String filter) throws IOException {
-    Collection<Proxy_CanteenData> canteens = proxy.getCanteens(filter).execute().body();
-    if (canteens == null) {
-      return null;
-    }
-    Collection<Canteen> result = new ArrayList<>(canteens.size());
-    for (Proxy_CanteenData canteen : canteens) {
-      result.add(canteen.toCanteen());
-    }
-    return result;
+  private static String formatAuthToken(String authToken) {
+    return String.format("Bearer %s", authToken);
   }
 
   @Override
@@ -50,11 +43,6 @@ class ServiceProxyImpl implements ServiceProxy {
     return canteen != null ? canteen.toCanteenDetails() : null;
   }
 
-  @Override
-  public ReviewData getReviewsDataForCanteen(String canteenId) throws IOException {
-    Proxy_CanteenReviewStatistics reviewData = proxy.getReviewStatisticsForCanteen(canteenId).execute().body();
-    return reviewData != null ? reviewData.toReviewData() : null;
-  }
 
   @Override
   public String authenticate(String userName, String password) throws IOException {
@@ -62,29 +50,42 @@ class ServiceProxyImpl implements ServiceProxy {
   }
 
   @Override
-  public void createReview(String authToken, String canteenId, int rating, String remark) throws IOException {
-    // TODO make bearer token nicer
-    proxy.postCanteenReview(String.format("Bearer %s", authToken), canteenId, rating, remark).execute();
+  public void updateCanteen(String authToken, String name, String address, String website, String phoneNumber) throws IOException {
+    proxy.updateCanteen(String.format("Bearer %s", authToken), name, address, website, phoneNumber).execute();
+  }
+
+  @Override
+  public void updateCanteenDish(String authToken, String dish, double dishPrice) throws IOException {
+    proxy.updateCanteenDish(formatAuthToken(authToken), dish, dishPrice).execute();
+  }
+
+  @Override
+  public void updateCanteenWaitingTime(String authToken, String waitingTime) throws IOException {
+    proxy.updateCanteenWaitingTime(formatAuthToken(authToken), waitingTime).execute();
   }
 
   private interface Proxy {
     @POST("authenticate")
     Call<String> postAuthenticate(@Query("userName") String userName, @Query("password") String password);
 
-    @GET("canteens")
-    Call<Collection<Proxy_CanteenData>> getCanteens(@Query("name") String name);
-
     @GET("canteen")
     Call<Proxy_CanteenDetails> getCanteen(@Header("Authorization") String authenticationToken);
 
-    @GET("canteens/{canteenId}/review-statistics")
-    Call<Proxy_CanteenReviewStatistics> getReviewStatisticsForCanteen(@Path("canteenId") String canteenId);
+    @PUT("canteen/data")
+    Call<Void> updateCanteen(@Header("Authorization") String authenticationToken,
+                                @Query("name") String name,
+                                @Query("address") String address,
+                                @Query("website") String website,
+                                @Query("phoneNumber") String phoneNumber);
 
-    @POST("canteens/{canteenId}/reviews")
-    Call<Void> postCanteenReview(@Header("Authorization") String authenticationToken,
-                                 @Path("canteenId") String canteenId,
-                                 @Query("rating") int rating,
-                                 @Query("remark") String remark);
+    @PUT("canteen/dish")
+    Call<Void> updateCanteenDish(@Header("Authorization") String authenticationToken,
+                                 @Query("dish") String dish,
+                                 @Query("dishPrice") double dishPrice);
+
+    @PUT("canteen/waiting-time")
+    Call<Void> updateCanteenWaitingTime(@Header("Authorization") String authenticationToken,
+                                        @Query("waitingTime") String waitingTime);
   }
 
   private static class Proxy_CanteenData {
