@@ -98,8 +98,9 @@ public class CanteenDetailActivity extends AppCompatActivity {
     try {
       saveCanteenData();
       saveCanteenDish();
+      saveCanteenWaitingTime();
     } catch (ParseException e) {
-      e.printStackTrace();
+      Log.e(TAG, String.format("Parsing values during update failed", e));
     }
   }
 
@@ -112,7 +113,7 @@ public class CanteenDetailActivity extends AppCompatActivity {
         try {
           ServiceProxyFactory.createProxy().updateCanteen(token, strings[0], strings[3], strings[1], strings[2]);
         } catch (IOException e) {
-          Log.e(TAG, String.format("Put went wrong %s", e));
+          Log.e(TAG, String.format("Saving Canteen-data failed", e));
         }
         return null;
       }
@@ -134,6 +135,9 @@ public class CanteenDetailActivity extends AppCompatActivity {
 
   @SuppressLint("StaticFieldLeak")
   private void saveCanteenDish() throws ParseException {
+    double dishPrice = NumberFormat.getCurrencyInstance()
+            .parse(edtPrice.getText().toString()).doubleValue();
+
     String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
     new AsyncTask<Object, Void, Void>() {
       @Override
@@ -141,7 +145,7 @@ public class CanteenDetailActivity extends AppCompatActivity {
         try {
           ServiceProxyFactory.createProxy().updateCanteenDish(token, (String) objects[0], (double) objects[1]);
         } catch (IOException e) {
-          Log.e(TAG, String.format("Something went wrong while saving the menu", e));
+          Log.e(TAG, String.format("Saving dish-data failed", e));
         }
         return null;
       }
@@ -155,9 +159,33 @@ public class CanteenDetailActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT)
                 .show();
       }
-    }.execute(edtMenu.getText().toString(),
-            NumberFormat.getCurrencyInstance().parse(edtPrice.getText().toString()).doubleValue());
+    }.execute(edtMenu.getText().toString(), dishPrice);
+  }
 
+  @SuppressLint("StaticFieldLeak")
+  private void saveCanteenWaitingTime() {
+    String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
+    new AsyncTask<String, Void, Void>() {
+      @Override
+      protected Void doInBackground(String... strings) {
+        try {
+          ServiceProxyFactory.createProxy().updateCanteenWaitingTime(token, strings[0]);
+        } catch (IOException e) {
+          Log.e(TAG, String.format("Saving dish-data failed", e));
+        }
+        return null;
+      }
+
+      @Override
+      protected void onPostExecute(Void aVoid) {
+        updateCanteenDetails();
+        Toast.makeText(
+                CanteenDetailActivity.this,
+                R.string.message_update_done,
+                Toast.LENGTH_SHORT)
+                .show();
+      }
+    }.execute(edtWaitingTime.getText().toString());
   }
 
   private void bindUiElements() {

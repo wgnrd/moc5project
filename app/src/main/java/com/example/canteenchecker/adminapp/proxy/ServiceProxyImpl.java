@@ -38,39 +38,15 @@ class ServiceProxyImpl implements ServiceProxy {
   }
 
   @Override
-  public Collection<Canteen> getCanteens(String filter) throws IOException {
-    Collection<Proxy_CanteenData> canteens = proxy.getCanteens(filter).execute().body();
-    if (canteens == null) {
-      return null;
-    }
-    Collection<Canteen> result = new ArrayList<>(canteens.size());
-    for (Proxy_CanteenData canteen : canteens) {
-      result.add(canteen.toCanteen());
-    }
-    return result;
-  }
-
-  @Override
   public CanteenDetails getCanteen(String authToken) throws IOException {
     Proxy_CanteenDetails canteen = proxy.getCanteen(String.format("Bearer %s", authToken)).execute().body();
     return canteen != null ? canteen.toCanteenDetails() : null;
   }
 
-  @Override
-  public ReviewData getReviewsDataForCanteen(String canteenId) throws IOException {
-    Proxy_CanteenReviewStatistics reviewData = proxy.getReviewStatisticsForCanteen(canteenId).execute().body();
-    return reviewData != null ? reviewData.toReviewData() : null;
-  }
 
   @Override
   public String authenticate(String userName, String password) throws IOException {
     return proxy.postAuthenticate(userName, password).execute().body();
-  }
-
-  @Override
-  public void createReview(String authToken, String canteenId, int rating, String remark) throws IOException {
-    // TODO make bearer token nicer
-    proxy.postCanteenReview(String.format("Bearer %s", authToken), canteenId, rating, remark).execute();
   }
 
   @Override
@@ -83,24 +59,17 @@ class ServiceProxyImpl implements ServiceProxy {
     proxy.updateCanteenDish(formatAuthToken(authToken), dish, dishPrice).execute();
   }
 
+  @Override
+  public void updateCanteenWaitingTime(String authToken, String waitingTime) throws IOException {
+    proxy.updateCanteenWaitingTime(formatAuthToken(authToken), waitingTime).execute();
+  }
+
   private interface Proxy {
     @POST("authenticate")
     Call<String> postAuthenticate(@Query("userName") String userName, @Query("password") String password);
 
-    @GET("canteens")
-    Call<Collection<Proxy_CanteenData>> getCanteens(@Query("name") String name);
-
     @GET("canteen")
     Call<Proxy_CanteenDetails> getCanteen(@Header("Authorization") String authenticationToken);
-
-    @GET("canteens/{canteenId}/review-statistics")
-    Call<Proxy_CanteenReviewStatistics> getReviewStatisticsForCanteen(@Path("canteenId") String canteenId);
-
-    @POST("canteens/{canteenId}/reviews")
-    Call<Void> postCanteenReview(@Header("Authorization") String authenticationToken,
-                                 @Path("canteenId") String canteenId,
-                                 @Query("rating") int rating,
-                                 @Query("remark") String remark);
 
     @PUT("canteen/data")
     Call<Void> updateCanteen(@Header("Authorization") String authenticationToken,
@@ -113,6 +82,10 @@ class ServiceProxyImpl implements ServiceProxy {
     Call<Void> updateCanteenDish(@Header("Authorization") String authenticationToken,
                                  @Query("dish") String dish,
                                  @Query("dishPrice") double dishPrice);
+
+    @PUT("canteen/waiting-time")
+    Call<Void> updateCanteenWaitingTime(@Header("Authorization") String authenticationToken,
+                                        @Query("waitingTime") String waitingTime);
   }
 
   private static class Proxy_CanteenData {
