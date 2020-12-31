@@ -20,6 +20,7 @@ import com.example.canteenchecker.adminapp.R;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.proxy.ServiceProxyFactory;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
@@ -67,6 +68,9 @@ public class CanteenDetailActivity extends AppCompatActivity {
       UiSettings uiSettings = googleMap.getUiSettings();
       uiSettings.setAllGesturesEnabled(false);
       uiSettings.setZoomControlsEnabled(true);
+      googleMap.setOnMapLongClickListener(latLng -> {
+        handleMapLongClick(googleMap, latLng);
+      });
     });
 
     setUiEditable(uiEditable);
@@ -92,6 +96,31 @@ public class CanteenDetailActivity extends AppCompatActivity {
     });
 
     updateCanteenDetails();
+  }
+
+  private void handleMapLongClick(GoogleMap googleMap, LatLng latLng) {
+    if (!uiEditable) {
+      return;
+    }
+
+    MarkerOptions markerOptions = new MarkerOptions();
+    markerOptions.position(latLng);
+
+    googleMap.clear();
+
+    googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
+    googleMap.addMarker(markerOptions);
+
+
+    Geocoder geocoder = new Geocoder(CanteenDetailActivity.this);
+    try {
+      Address addr = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0);
+      edtAddress.setText(addr.getAddressLine(0));
+      Log.e(TAG, String.format("New Address: %s", addr.getAddressLine(0)));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private void saveCanteen() {
@@ -214,6 +243,11 @@ public class CanteenDetailActivity extends AppCompatActivity {
     edtWeb.setEnabled(value);
     edtPhone.setEnabled(value);
     edtAddress.setEnabled(value);
+
+    mpfAddress.getMapAsync(googleMap -> {
+      UiSettings uiSettings = googleMap.getUiSettings();
+      uiSettings.setAllGesturesEnabled(value);
+    });
   }
 
   @SuppressLint("StaticFieldLeak")
@@ -286,7 +320,9 @@ public class CanteenDetailActivity extends AppCompatActivity {
 
           @Override
           protected void onPostExecute(final LatLng latLng) {
+
             mpfAddress.getMapAsync(googleMap -> {
+
               googleMap.clear();
               Log.w(TAG, String.format("Location", latLng));
 
