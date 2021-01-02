@@ -9,6 +9,8 @@ import com.google.android.gms.common.internal.IResolveAccountCallbacks;
 import com.google.android.gms.maps.CameraUpdateFactory;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -28,6 +30,7 @@ import retrofit2.http.Query;
 // https://moc5.projekte.fh-hagenberg.at/CanteenChecker/swagger/index.html
 class ServiceProxyImpl implements ServiceProxy {
   private static final String SERVICE_BASE_URL = "https://moc5.projekte.fh-hagenberg.at/CanteenChecker/api/admin/";
+  private static final String TAG = ServiceProxyImpl.class.toString();
 
   private final Proxy proxy = new Retrofit.Builder()
           .baseUrl(SERVICE_BASE_URL)
@@ -140,9 +143,15 @@ class ServiceProxyImpl implements ServiceProxy {
     String creator;
     int rating;
     String remark;
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS");
 
     ReviewData toReviewData() {
-      return new ReviewData(rating, remark, id, creator, creationDate);
+      try {
+        return new ReviewData(rating, remark, id, creator, format.parse(creationDate));
+      } catch (ParseException e) {
+        Log.e(TAG, "Parsing of review date failed");
+        return null;
+      }
     }
   }
 }

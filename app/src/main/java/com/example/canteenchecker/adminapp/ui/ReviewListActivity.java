@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,8 +27,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class ReviewListActivity  extends AppCompatActivity {
@@ -108,6 +113,10 @@ public class ReviewListActivity  extends AppCompatActivity {
 
     static class ViewHolder extends RecyclerView.ViewHolder {
       private TextView txvRemark = itemView.findViewById(R.id.txvRemark);
+      private TextView txvCreator = itemView.findViewById(R.id.txvCreator);
+      private TextView txvCreationDate = itemView.findViewById(R.id.txvCreationDate);
+      private RatingBar rtbRating = itemView.findViewById(R.id.rtbRating);
+      private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
       public ViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -115,6 +124,9 @@ public class ReviewListActivity  extends AppCompatActivity {
 
       void updateView(final ReviewData review) {
         txvRemark.setText(review.getRemark());
+        txvCreator.setText(review.getCreator());
+        txvCreationDate.setText(dateFormatter.format(review.getCreationDate()));
+        rtbRating.setRating(review.getRating());
       }
     }
 

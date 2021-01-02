@@ -7,9 +7,9 @@ public class ReviewData {
   private final String remark;
   private final String id;
   private final String creator;
-  private final String creationDate;
+  private final Date creationDate;
 
-  public ReviewData(int rating, String remark, String id, String creator, String creationDate) {
+  public ReviewData(int rating, String remark, String id, String creator, Date creationDate) {
     this.rating = rating;
     this.remark = remark;
     this.creationDate = creationDate;
@@ -17,7 +17,7 @@ public class ReviewData {
     this.id = id;
   }
 
-  public String getCreationDate() {
+  public Date getCreationDate() {
     return creationDate;
   }
 
