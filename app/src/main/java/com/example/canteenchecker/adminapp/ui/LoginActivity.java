@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         ((CanteenAdminApplication) getApplication()).setAuthenticationToken(s);
         setResult(RESULT_OK);
         v.getContext().startActivity(
-                CanteenDetailActivity.createIntent(v.getContext(), "1"));
+                CanteenDetailActivity.createIntent(v.getContext()));
       } else {
         setUIEnabled(true);
         edtPassword.setText(null);

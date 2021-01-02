@@ -14,8 +14,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnEdit"
-        android:text="@string/text_edit"
-        android:layout_marginBottom="@dimen/distance_small"/>
+        android:text="@string/text_edit"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnReviews"
+        android:text="Reviews"
+        android:layout_marginBottom="@dimen/distance_small" />
 
     <EditText
         android:layout_width="match_parent"
@@ -42,6 +48,7 @@
 
 
     <TextView
+        style="@style/TextAppearance.MaterialComponents.Overline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hint_canteen_waitingTime"

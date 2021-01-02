@@ -8,6 +8,9 @@
     <string name="text_cancel">Cancel</string>
     <string name="text_edit">Edit</string>
 
+    <!-- ReviewActivity -->
+    <string name="text_reviews">Reviews</string>
+
     <!-- CanteenDetailsActivity -->
     <string name="text_dish">Dish of the day</string>
     <string name="text_waiting_time">Current waiting time</string>

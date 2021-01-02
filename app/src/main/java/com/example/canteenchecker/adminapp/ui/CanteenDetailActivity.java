@@ -42,6 +42,7 @@ public class CanteenDetailActivity extends AppCompatActivity {
   private Button btnSave;
   private Button btnCancel;
   private Button btnEdit;
+  private Button btnReviews;
   private EditText edtName;
   private EditText edtMenu;
   private EditText edtPrice;
@@ -51,10 +52,8 @@ public class CanteenDetailActivity extends AppCompatActivity {
   private EditText edtAddress;
   private SupportMapFragment mpfAddress;
 
-  public static Intent createIntent(Context context, String canteenId) {
-    Intent intent = new Intent(context, CanteenDetailActivity.class);
-    intent.putExtra(CANTEEN_ID_KEY, canteenId);
-    return intent;
+  public static Intent createIntent(Context context) {
+    return new Intent(context, CanteenDetailActivity.class);
   }
 
   @Override
@@ -94,6 +93,12 @@ public class CanteenDetailActivity extends AppCompatActivity {
       updateCanteenDetails();
       setUiEditable(uiEditable);
     });
+
+    btnReviews.setOnClickListener(v -> {
+      v.getContext().startActivity(ReviewListActivity.createIntent(v.getContext()));
+    });
+
+
 
     updateCanteenDetails();
   }
@@ -230,6 +235,7 @@ public class CanteenDetailActivity extends AppCompatActivity {
     edtAddress = findViewById(R.id.edtAddress);
     mpfAddress = (SupportMapFragment) getSupportFragmentManager()
             .findFragmentById(R.id.mpfMap);
+    btnReviews = findViewById(R.id.btnReviews);
   }
 
   private void setUiEditable(boolean value) {

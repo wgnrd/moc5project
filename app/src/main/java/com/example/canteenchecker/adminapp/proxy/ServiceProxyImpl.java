@@ -5,10 +5,13 @@ import android.util.Log;
 import com.example.canteenchecker.adminapp.core.Canteen;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.core.ReviewData;
+import com.google.android.gms.common.internal.IResolveAccountCallbacks;
+import com.google.android.gms.maps.CameraUpdateFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -64,6 +67,20 @@ class ServiceProxyImpl implements ServiceProxy {
     proxy.updateCanteenWaitingTime(formatAuthToken(authToken), waitingTime).execute();
   }
 
+  @Override
+  public Collection<ReviewData> getReviews(String authToken) throws IOException {
+    Collection<Proxy_CanteenReview> reviews = proxy.getReviews(formatAuthToken(authToken)).execute().body();
+    if (reviews == null) {
+      return null;
+    }
+
+    Collection<ReviewData> result = new ArrayList<>(reviews.size());
+    for (Proxy_CanteenReview review : reviews) {
+      result.add(review.toReviewData());
+    }
+    return result;
+  }
+
   private interface Proxy {
     @POST("authenticate")
     Call<String> postAuthenticate(@Query("userName") String userName, @Query("password") String password);
@@ -86,6 +103,9 @@ class ServiceProxyImpl implements ServiceProxy {
     @PUT("canteen/waiting-time")
     Call<Void> updateCanteenWaitingTime(@Header("Authorization") String authenticationToken,
                                         @Query("waitingTime") String waitingTime);
+
+    @GET("canteen/reviews")
+    Call<Collection<Proxy_CanteenReview>> getReviews(@Header("Authorization") String authenticationToken);
   }
 
   private static class Proxy_CanteenData {
@@ -114,15 +134,15 @@ class ServiceProxyImpl implements ServiceProxy {
     }
   }
 
-  private static class Proxy_CanteenReviewStatistics {
-    int countOneStar;
-    int countTwoStars;
-    int countThreeStars;
-    int countFourStars;
-    int countFiveStars;
+  private static class Proxy_CanteenReview {
+    String id;
+    String creationDate;
+    String creator;
+    int rating;
+    String remark;
 
     ReviewData toReviewData() {
-      return new ReviewData(countOneStar, countTwoStars, countThreeStars, countFourStars, countFiveStars);
+      return new ReviewData(rating, remark, id, creator, creationDate);
     }
   }
 }

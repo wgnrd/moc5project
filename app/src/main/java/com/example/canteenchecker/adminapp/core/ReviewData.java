@@ -1,49 +1,40 @@
 package com.example.canteenchecker.adminapp.core;
 
+import java.util.Date;
+
 public class ReviewData {
-    private final int ratingsOne;
-    private final int ratingsTwo;
-    private final int ratingsThree;
-    private final int ratingsFour;
-    private final int ratingsFive;
-    private final int totalRatings;
-    private final float averageRating;
+  private final int rating;
+  private final String remark;
+  private final String id;
+  private final String creator;
+  private final String creationDate;
 
-    public ReviewData(int ratingsOne, int ratingsTwo, int ratingsThree, int ratingsFour, int ratingsFive) {
-        this.ratingsOne = ratingsOne;
-        this.ratingsTwo = ratingsTwo;
-        this.ratingsThree = ratingsThree;
-        this.ratingsFour = ratingsFour;
-        this.ratingsFive = ratingsFive;
-        totalRatings = ratingsOne + ratingsTwo + ratingsThree + ratingsFour + ratingsFive;
-        averageRating = totalRatings == 0 ? 0 : (ratingsOne + ratingsTwo * 2 + ratingsThree * 3 + ratingsFour * 4 + ratingsFive * 5) / (float)totalRatings;
-    }
+  public ReviewData(int rating, String remark, String id, String creator, String creationDate) {
+    this.rating = rating;
+    this.remark = remark;
+    this.creationDate = creationDate;
+    this.creator = creator;
+    this.id = id;
+  }
 
-    public int getRatingsOne() {
-        return ratingsOne;
-    }
+  public String getCreationDate() {
+    return creationDate;
+  }
 
-    public int getRatingsTwo() {
-        return ratingsTwo;
-    }
+  public String getCreator() {
+    return creator;
+  }
 
-    public int getRatingsThree() {
-        return ratingsThree;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public int getRatingsFour() {
-        return ratingsFour;
-    }
+  public String getRemark() {
+    return remark;
+  }
 
-    public int getRatingsFive() {
-        return ratingsFive;
-    }
-
-    public float getAverageRating() {
-        return averageRating;
-    }
-
-    public int getTotalRatings() {
-        return totalRatings;
-    }
+  public int getRating() {
+    return rating;
+  }
 }
+

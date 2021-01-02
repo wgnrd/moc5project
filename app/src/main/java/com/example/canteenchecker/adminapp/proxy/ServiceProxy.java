@@ -3,6 +3,7 @@ package com.example.canteenchecker.adminapp.proxy;
 import com.example.canteenchecker.adminapp.core.Canteen;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.core.ReviewData;
+import com.google.gson.internal.bind.CollectionTypeAdapterFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -17,4 +18,7 @@ public interface ServiceProxy {
     void updateCanteenDish(String authToken, String dish, double dishPrice) throws IOException;
 
     void updateCanteenWaitingTime(String authToken, String waitingTime) throws IOException;
+
+    Collection<ReviewData> getReviews(String authToken) throws IOException;
+
 }
