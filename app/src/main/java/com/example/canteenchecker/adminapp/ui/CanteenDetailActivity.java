@@ -5,13 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,8 +44,6 @@ public class CanteenDetailActivity extends AppCompatActivity {
   private CanteenDetails canteen = null;
 
   private Button btnSave;
-  private Button btnCancel;
-  private Button btnEdit;
   private Button btnReviews;
   private EditText edtName;
   private EditText edtMenu;
@@ -54,6 +56,32 @@ public class CanteenDetailActivity extends AppCompatActivity {
 
   public static Intent createIntent(Context context) {
     return new Intent(context, CanteenDetailActivity.class);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_activity_canteen_detail, menu);
+    return super.onCreateOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    final int id = item.getItemId();
+    if (id == R.id.mniLogout) {
+      ((CanteenAdminApplication) getApplication()).setAuthenticationToken(null);
+      finish();
+      return true;
+    } else if (id == R.id.mniEdit) {
+      // show website
+      uiEditable = !uiEditable;
+      setUiEditable(uiEditable);
+      if (!uiEditable) {
+        updateCanteenDetails();
+      }
+      return true;
+    } else {
+      return super.onOptionsItemSelected(item);
+    }
   }
 
   @Override
@@ -74,13 +102,6 @@ public class CanteenDetailActivity extends AppCompatActivity {
 
     setUiEditable(uiEditable);
 
-    btnEdit.setOnClickListener(v -> {
-      uiEditable = !uiEditable;
-      setUiEditable(uiEditable);
-      if (!uiEditable) {
-        updateCanteenDetails();
-      }
-    });
 
     btnSave.setOnClickListener(v -> {
       uiEditable = false;
@@ -88,16 +109,10 @@ public class CanteenDetailActivity extends AppCompatActivity {
       setUiEditable(uiEditable);
     });
 
-    btnCancel.setOnClickListener(v -> {
-      uiEditable = false;
-      updateCanteenDetails();
-      setUiEditable(uiEditable);
-    });
 
     btnReviews.setOnClickListener(v -> {
       v.getContext().startActivity(ReviewListActivity.createIntent(v.getContext()));
     });
-
 
 
     updateCanteenDetails();
@@ -223,8 +238,6 @@ public class CanteenDetailActivity extends AppCompatActivity {
   }
 
   private void bindUiElements() {
-    btnEdit = findViewById(R.id.btnEdit);
-    btnCancel = findViewById(R.id.btnCancel);
     btnSave = findViewById(R.id.btnSave);
     edtName = findViewById(R.id.edtName);
     edtMenu = findViewById(R.id.edtMenu);
@@ -239,7 +252,6 @@ public class CanteenDetailActivity extends AppCompatActivity {
   }
 
   private void setUiEditable(boolean value) {
-    btnCancel.setEnabled(value);
     btnSave.setEnabled(value);
 
     edtName.setEnabled(value);
@@ -249,6 +261,7 @@ public class CanteenDetailActivity extends AppCompatActivity {
     edtWeb.setEnabled(value);
     edtPhone.setEnabled(value);
     edtAddress.setEnabled(value);
+
 
     mpfAddress.getMapAsync(googleMap -> {
       UiSettings uiSettings = googleMap.getUiSettings();

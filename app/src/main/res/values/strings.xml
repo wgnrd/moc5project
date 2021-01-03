@@ -10,6 +10,7 @@
     <string name="text_delete">Delete</string>
     <string name="text_yes">Yes</string>
 
+
     <!-- ReviewActivity -->
     <string name="text_reviews">Reviews</string>
     <string name="dialog_delete_review">Delete Review</string>
@@ -40,6 +41,7 @@
     <string name="hint_user_name">User name</string>
     <string name="hint_password">Password</string>
     <string name="text_log_in">Log in</string>
+    <string name="text_log_out">Log out</string>
     <string name="message_login_failed">Login not successful - please try again</string>
 
     <!-- ReviewsFragment -->

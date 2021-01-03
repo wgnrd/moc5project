@@ -34,13 +34,22 @@ public class LoginActivity extends AppCompatActivity {
     edtPassword = findViewById(R.id.edtPassword);
     btnLogIn = findViewById(R.id.btnLogIn);
 
-
-    if (((CanteenAdminApplication) getApplication()).isAuthenticated()) {
-      // TODO - maybe check if authenticated and throw back to details view
-    }
     btnLogIn.setOnClickListener(this::LoginHandler);
   }
 
+  // gets called if the activity resumes from stack
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    if (((CanteenAdminApplication) getApplication()).isAuthenticated()) {
+      Log.i(TAG, "Rethrow back to details");
+      startActivity(CanteenDetailActivity.createIntent(this));
+    }
+
+    setUIEnabled(true);
+    edtPassword.setText(null);
+  }
 
   private void setUIEnabled(boolean enabled) {
     btnLogIn.setEnabled(enabled);

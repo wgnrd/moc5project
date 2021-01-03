@@ -158,7 +158,8 @@ public class ReviewListActivity extends AppCompatActivity {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
       holder.updateView(reviewDataList.get(position));
-      holder.btnDelete.setOnClickListener(v -> reviewListActivity.DeleteReview(reviewDataList.get(position).getId()));
+      holder.btnDelete.setOnClickListener(v -> reviewListActivity
+              .DeleteReview(reviewDataList.get(position).getId()));
     }
 
     @Override
