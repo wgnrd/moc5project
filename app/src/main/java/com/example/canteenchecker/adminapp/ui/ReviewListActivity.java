@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -35,14 +37,17 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-public class ReviewListActivity  extends AppCompatActivity {
+import retrofit2.http.Header;
+
+public class ReviewListActivity extends AppCompatActivity {
   private static final String TAG = ReviewListActivity.class.toString();
 
   public static Intent createIntent(Context context) {
     return new Intent(context, ReviewListActivity.class);
   }
 
-  private final ReviewsAdapter reviewsAdapter = new ReviewsAdapter();
+  private final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(this);
+  private SwipeRefreshLayout srlSwipeRefreshLayout;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,11 +58,15 @@ public class ReviewListActivity  extends AppCompatActivity {
     rcvReviews.setLayoutManager(new LinearLayoutManager(this));
     rcvReviews.setAdapter(reviewsAdapter);
 
+    srlSwipeRefreshLayout = findViewById(R.id.srlSwipeRefreshLayout);
+    srlSwipeRefreshLayout.setOnRefreshListener(this::updateReviews);
+
     updateReviews();
   }
 
   @SuppressLint("StaticFieldLeak")
   private void updateReviews() {
+    srlSwipeRefreshLayout.setRefreshing(true);
     String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
     new AsyncTask<String, Void, Collection<ReviewData>>() {
       @Override
@@ -74,6 +83,28 @@ public class ReviewListActivity  extends AppCompatActivity {
       protected void onPostExecute(Collection<ReviewData> reviewData) {
         reviewsAdapter.displayReviews(reviewData);
         Log.i(TAG, "Reviews loaded");
+        srlSwipeRefreshLayout.setRefreshing(false);
+      }
+    }.execute(token);
+  }
+
+  @SuppressLint("StaticFieldLeak")
+  void Foo(String reviewId) {
+    String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
+    new AsyncTask<String, Void, Void>() {
+      @Override
+      protected Void doInBackground(String... strings) {
+        try {
+          ServiceProxyFactory.createProxy().deleteReview(token, reviewId);
+        } catch (IOException e) {
+          Log.e(TAG, "Something went wrong during delete of reviews");
+        }
+        return null;
+      }
+
+      @Override
+      protected void onPostExecute(Void aVoid) {
+        updateReviews();
       }
     }.execute(token);
   }
@@ -81,6 +112,11 @@ public class ReviewListActivity  extends AppCompatActivity {
 
   private static class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
     private final List<ReviewData> reviewDataList = new ArrayList<>();
+    private final ReviewListActivity reviewListActivity;
+
+    public ReviewsAdapter(ReviewListActivity reviewListActivity) {
+      this.reviewListActivity = reviewListActivity;
+    }
 
     @NonNull
     @Override
@@ -94,6 +130,9 @@ public class ReviewListActivity  extends AppCompatActivity {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
       holder.updateView(reviewDataList.get(position));
+      holder.btnDelete.setOnClickListener(v -> {
+        reviewListActivity.Foo(reviewDataList.get(position).getId());
+      });
     }
 
     @Override
@@ -110,18 +149,19 @@ public class ReviewListActivity  extends AppCompatActivity {
       notifyDataSetChanged();
     }
 
-
     static class ViewHolder extends RecyclerView.ViewHolder {
-      private TextView txvRemark = itemView.findViewById(R.id.txvRemark);
-      private TextView txvCreator = itemView.findViewById(R.id.txvCreator);
-      private TextView txvCreationDate = itemView.findViewById(R.id.txvCreationDate);
-      private RatingBar rtbRating = itemView.findViewById(R.id.rtbRating);
-      private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+      private final TextView txvRemark = itemView.findViewById(R.id.txvRemark);
+      private final TextView txvCreator = itemView.findViewById(R.id.txvCreator);
+      private final TextView txvCreationDate = itemView.findViewById(R.id.txvCreationDate);
+      private final RatingBar rtbRating = itemView.findViewById(R.id.rtbRating);
+      private final Button btnDelete = itemView.findViewById(R.id.btnDelete);
+      private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
       public ViewHolder(@NonNull View itemView) {
         super(itemView);
       }
 
+      @SuppressLint("StaticFieldLeak")
       void updateView(final ReviewData review) {
         txvRemark.setText(review.getRemark());
         txvCreator.setText(review.getCreator());
@@ -129,7 +169,6 @@ public class ReviewListActivity  extends AppCompatActivity {
         rtbRating.setRating(review.getRating());
       }
     }
-
   }
 }
 //496359e5-0cf3-4ab9-b028-ef2313c58100

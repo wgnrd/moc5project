@@ -21,4 +21,5 @@ public interface ServiceProxy {
 
     Collection<ReviewData> getReviews(String authToken) throws IOException;
 
+    void deleteReview(String authToken, String reviewId) throws IOException;
 }

@@ -19,6 +19,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -84,6 +85,11 @@ class ServiceProxyImpl implements ServiceProxy {
     return result;
   }
 
+  @Override
+  public void deleteReview(String authToken, String reviewId) throws IOException {
+    proxy.deleteReview(formatAuthToken(authToken), reviewId).execute().body();
+  }
+
   private interface Proxy {
     @POST("authenticate")
     Call<String> postAuthenticate(@Query("userName") String userName, @Query("password") String password);
@@ -109,6 +115,10 @@ class ServiceProxyImpl implements ServiceProxy {
 
     @GET("canteen/reviews")
     Call<Collection<Proxy_CanteenReview>> getReviews(@Header("Authorization") String authenticationToken);
+
+    @DELETE("canteen/reviews/{reviewId}")
+    Call<Void> deleteReview(@Header("Authorization") String authenticationToken,
+                            @Path("reviewId") String reviewId);
   }
 
   private static class Proxy_CanteenData {
