@@ -5,15 +5,21 @@ import android.util.Log;
 import com.example.canteenchecker.adminapp.core.Canteen;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.core.ReviewData;
+import com.example.canteenchecker.adminapp.core.ReviewStatisticData;
+import com.google.android.gms.maps.CameraUpdateFactory;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -25,6 +31,7 @@ import retrofit2.http.Query;
 // https://moc5.projekte.fh-hagenberg.at/CanteenChecker/swagger/index.html
 class ServiceProxyImpl implements ServiceProxy {
   private static final String SERVICE_BASE_URL = "https://moc5.projekte.fh-hagenberg.at/CanteenChecker/api/admin/";
+  private static final String TAG = ServiceProxyImpl.class.toString();
 
   private final Proxy proxy = new Retrofit.Builder()
           .baseUrl(SERVICE_BASE_URL)
@@ -64,6 +71,32 @@ class ServiceProxyImpl implements ServiceProxy {
     proxy.updateCanteenWaitingTime(formatAuthToken(authToken), waitingTime).execute();
   }
 
+  @Override
+  public Collection<ReviewData> getReviews(String authToken) throws IOException {
+    Collection<Proxy_CanteenReview> reviews = proxy.getReviews(formatAuthToken(authToken)).execute().body();
+    if (reviews == null) {
+      return null;
+    }
+
+    Collection<ReviewData> result = new ArrayList<>(reviews.size());
+    for (Proxy_CanteenReview review : reviews) {
+      result.add(review.toReviewData());
+    }
+    return result;
+  }
+
+  @Override
+  public void deleteReview(String authToken, String reviewId) throws IOException {
+    proxy.deleteReview(formatAuthToken(authToken), reviewId).execute().body();
+  }
+
+  @Override
+  public ReviewStatisticData getReviewStatistics(String authToken) throws IOException {
+    Proxy_CanteenReviewStatistics statistics = proxy.getReviewStatistics(formatAuthToken(authToken)).execute().body();
+    return statistics != null ? statistics.toReviewStatisticData() : null;
+  }
+
+
   private interface Proxy {
     @POST("authenticate")
     Call<String> postAuthenticate(@Query("userName") String userName, @Query("password") String password);
@@ -86,18 +119,16 @@ class ServiceProxyImpl implements ServiceProxy {
     @PUT("canteen/waiting-time")
     Call<Void> updateCanteenWaitingTime(@Header("Authorization") String authenticationToken,
                                         @Query("waitingTime") String waitingTime);
-  }
 
-  private static class Proxy_CanteenData {
-    String id;
-    String name;
-    String dish;
-    float dishPrice;
-    float averageRating;
+    @GET("canteen/reviews")
+    Call<Collection<Proxy_CanteenReview>> getReviews(@Header("Authorization") String authenticationToken);
 
-    Canteen toCanteen() {
-      return new Canteen(id, name, dish, dishPrice, averageRating);
-    }
+    @DELETE("canteen/reviews/{reviewId}")
+    Call<Void> deleteReview(@Header("Authorization") String authenticationToken,
+                            @Path("reviewId") String reviewId);
+
+    @GET("canteen/review-statistics")
+    Call<Proxy_CanteenReviewStatistics> getReviewStatistics(@Header("Authorization") String authenticationToken);
   }
 
   private static class Proxy_CanteenDetails {
@@ -114,6 +145,24 @@ class ServiceProxyImpl implements ServiceProxy {
     }
   }
 
+  private static class Proxy_CanteenReview {
+    String id;
+    String creationDate;
+    String creator;
+    int rating;
+    String remark;
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS");
+
+    ReviewData toReviewData() {
+      try {
+        return new ReviewData(rating, remark, id, creator, format.parse(creationDate));
+      } catch (ParseException e) {
+        Log.e(TAG, "Parsing of review date failed");
+        return null;
+      }
+    }
+  }
+
   private static class Proxy_CanteenReviewStatistics {
     int countOneStar;
     int countTwoStars;
@@ -121,8 +170,8 @@ class ServiceProxyImpl implements ServiceProxy {
     int countFourStars;
     int countFiveStars;
 
-    ReviewData toReviewData() {
-      return new ReviewData(countOneStar, countTwoStars, countThreeStars, countFourStars, countFiveStars);
+    ReviewStatisticData toReviewStatisticData() {
+      return new ReviewStatisticData(countOneStar, countTwoStars, countThreeStars, countFourStars, countFiveStars);
     }
   }
 }

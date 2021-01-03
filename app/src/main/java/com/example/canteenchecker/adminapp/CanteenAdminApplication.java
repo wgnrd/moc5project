@@ -2,13 +2,16 @@ package com.example.canteenchecker.adminapp;
 
 import android.app.Application;
 
+import com.example.canteenchecker.adminapp.service.MyFireBaseMessagingService;
+import com.google.firebase.FirebaseApp;
+
 public class CanteenAdminApplication extends Application {
   private String authenticationToken = null;
 
   @Override
   public void onCreate() {
     super.onCreate();
-    // MyFireBaseMessagingService.subscribeToCanteenUpdates();
+    MyFireBaseMessagingService.subscribeToReviewUpdates();
   }
 
   public synchronized void setAuthenticationToken(String authenticationToken) { this.authenticationToken = authenticationToken; }
