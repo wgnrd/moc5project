@@ -72,7 +72,8 @@ public class ReviewListActivity extends AppCompatActivity {
 
 
     LocalBroadcastManager.getInstance(this)
-            .registerReceiver(broadcastReceiver, Broadcasting.createCanteenChangedBroadcastIntentFilter());
+            .registerReceiver(broadcastReceiver,
+                    Broadcasting.createReviewsChangedBroadcastIntentFilter());
 
     updateReviews();
   }
