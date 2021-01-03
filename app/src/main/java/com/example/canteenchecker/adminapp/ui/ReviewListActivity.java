@@ -1,6 +1,8 @@
 package com.example.canteenchecker.adminapp.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -9,10 +11,8 @@ import android.os.Bundle;
 import com.example.canteenchecker.adminapp.CanteenAdminApplication;
 import com.example.canteenchecker.adminapp.R;
 import com.example.canteenchecker.adminapp.core.ReviewData;
-import com.example.canteenchecker.adminapp.proxy.ServiceProxy;
 import com.example.canteenchecker.adminapp.proxy.ServiceProxyFactory;
 
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,15 +29,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-
-import retrofit2.http.Header;
 
 public class ReviewListActivity extends AppCompatActivity {
   private static final String TAG = ReviewListActivity.class.toString();
@@ -74,7 +69,7 @@ public class ReviewListActivity extends AppCompatActivity {
         try {
           return ServiceProxyFactory.createProxy().getReviews(token);
         } catch (IOException e) {
-          Log.e(TAG, String.format("Loading reviews failed ", e));
+          Log.e(TAG, String.format("Loading reviews failed %s", e));
           return null;
         }
       }
@@ -89,24 +84,33 @@ public class ReviewListActivity extends AppCompatActivity {
   }
 
   @SuppressLint("StaticFieldLeak")
-  void Foo(String reviewId) {
-    String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
-    new AsyncTask<String, Void, Void>() {
-      @Override
-      protected Void doInBackground(String... strings) {
-        try {
-          ServiceProxyFactory.createProxy().deleteReview(token, reviewId);
-        } catch (IOException e) {
-          Log.e(TAG, "Something went wrong during delete of reviews");
-        }
-        return null;
-      }
+  void DeleteReview(String reviewId) {
+    final View view = LayoutInflater.from(this).inflate(R.layout.dialog_delete_review, null);
 
-      @Override
-      protected void onPostExecute(Void aVoid) {
-        updateReviews();
-      }
-    }.execute(token);
+    String token = ((CanteenAdminApplication) getApplication()).getAuthenticationToken();
+
+    new AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_delete_review)
+            .setView(view)
+            .setPositiveButton(R.string.text_yes, (dialog, which) -> {
+              dialog.dismiss();
+              new AsyncTask<String, Void, Void>() {
+                @Override
+                protected Void doInBackground(String... strings) {
+                  try {
+                    ServiceProxyFactory.createProxy().deleteReview(token, reviewId);
+                  } catch (IOException e) {
+                    Log.e(TAG, "Something went wrong during removal of reviews");
+                  }
+                  return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                  updateReviews();
+                }
+              }.execute(token);
+            }).create().show();
   }
 
 
@@ -130,9 +134,7 @@ public class ReviewListActivity extends AppCompatActivity {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
       holder.updateView(reviewDataList.get(position));
-      holder.btnDelete.setOnClickListener(v -> {
-        reviewListActivity.Foo(reviewDataList.get(position).getId());
-      });
+      holder.btnDelete.setOnClickListener(v -> reviewListActivity.DeleteReview(reviewDataList.get(position).getId()));
     }
 
     @Override
