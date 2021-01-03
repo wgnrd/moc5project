@@ -3,6 +3,7 @@ package com.example.canteenchecker.adminapp.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 
 import com.example.canteenchecker.adminapp.CanteenAdminApplication;
 import com.example.canteenchecker.adminapp.R;
+import com.example.canteenchecker.adminapp.core.Broadcasting;
 import com.example.canteenchecker.adminapp.core.ReviewData;
 import com.example.canteenchecker.adminapp.proxy.ServiceProxyFactory;
 
@@ -24,6 +26,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -41,6 +44,14 @@ public class ReviewListActivity extends AppCompatActivity {
     return new Intent(context, ReviewListActivity.class);
   }
 
+  private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      updateReviews();
+    }
+  };
+
   private final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(this);
   private SwipeRefreshLayout srlSwipeRefreshLayout;
 
@@ -56,7 +67,20 @@ public class ReviewListActivity extends AppCompatActivity {
     srlSwipeRefreshLayout = findViewById(R.id.srlSwipeRefreshLayout);
     srlSwipeRefreshLayout.setOnRefreshListener(this::updateReviews);
 
+    getFragmentManager().beginTransaction()
+            .replace(R.id.lnlReviewStatistic, ReviewStatisticFragment.create()).commit();
+
+
+    LocalBroadcastManager.getInstance(this)
+            .registerReceiver(broadcastReceiver, Broadcasting.createCanteenChangedBroadcastIntentFilter());
+
     updateReviews();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
   }
 
   @SuppressLint("StaticFieldLeak")

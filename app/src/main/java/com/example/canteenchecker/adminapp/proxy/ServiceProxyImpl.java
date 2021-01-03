@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.canteenchecker.adminapp.core.Canteen;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.core.ReviewData;
+import com.example.canteenchecker.adminapp.core.ReviewStatisticData;
 import com.google.android.gms.common.internal.IResolveAccountCallbacks;
 import com.google.android.gms.maps.CameraUpdateFactory;
 
@@ -90,6 +91,13 @@ class ServiceProxyImpl implements ServiceProxy {
     proxy.deleteReview(formatAuthToken(authToken), reviewId).execute().body();
   }
 
+  @Override
+  public ReviewStatisticData getReviewStatistics(String authToken) throws IOException {
+    Proxy_CanteenReviewStatistics statistics = proxy.getReviewStatistics(formatAuthToken(authToken)).execute().body();
+    return statistics != null ? statistics.toReviewStatisticData() : null;
+  }
+
+
   private interface Proxy {
     @POST("authenticate")
     Call<String> postAuthenticate(@Query("userName") String userName, @Query("password") String password);
@@ -119,18 +127,9 @@ class ServiceProxyImpl implements ServiceProxy {
     @DELETE("canteen/reviews/{reviewId}")
     Call<Void> deleteReview(@Header("Authorization") String authenticationToken,
                             @Path("reviewId") String reviewId);
-  }
 
-  private static class Proxy_CanteenData {
-    String id;
-    String name;
-    String dish;
-    float dishPrice;
-    float averageRating;
-
-    Canteen toCanteen() {
-      return new Canteen(id, name, dish, dishPrice, averageRating);
-    }
+    @GET("canteen/review-statistics")
+    Call<Proxy_CanteenReviewStatistics> getReviewStatistics(@Header("Authorization") String authenticationToken);
   }
 
   private static class Proxy_CanteenDetails {
@@ -162,6 +161,18 @@ class ServiceProxyImpl implements ServiceProxy {
         Log.e(TAG, "Parsing of review date failed");
         return null;
       }
+    }
+  }
+
+  private static class Proxy_CanteenReviewStatistics {
+    int countOneStar;
+    int countTwoStars;
+    int countThreeStars;
+    int countFourStars;
+    int countFiveStars;
+
+    ReviewStatisticData toReviewStatisticData() {
+      return new ReviewStatisticData(countOneStar, countTwoStars, countThreeStars, countFourStars, countFiveStars);
     }
   }
 }
