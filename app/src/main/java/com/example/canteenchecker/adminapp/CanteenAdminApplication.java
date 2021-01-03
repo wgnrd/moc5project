@@ -11,7 +11,6 @@ public class CanteenAdminApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    // FirebaseApp.initializeApp(this);
     MyFireBaseMessagingService.subscribeToReviewUpdates();
   }
 

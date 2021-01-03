@@ -45,7 +45,6 @@ public class ReviewListActivity extends AppCompatActivity {
   }
 
   private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-
     @Override
     public void onReceive(Context context, Intent intent) {
       updateReviews();
@@ -169,7 +168,6 @@ public class ReviewListActivity extends AppCompatActivity {
 
     void displayReviews(Collection<ReviewData> reviewData) {
       reviewDataList.clear();
-      Log.e(TAG, String.format("Hello, %s", reviewData.size()));
       if (reviewData != null) {
         reviewDataList.addAll(reviewData);
       }

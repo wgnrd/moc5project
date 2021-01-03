@@ -6,7 +6,6 @@ import com.example.canteenchecker.adminapp.core.Canteen;
 import com.example.canteenchecker.adminapp.core.CanteenDetails;
 import com.example.canteenchecker.adminapp.core.ReviewData;
 import com.example.canteenchecker.adminapp.core.ReviewStatisticData;
-import com.google.android.gms.common.internal.IResolveAccountCallbacks;
 import com.google.android.gms.maps.CameraUpdateFactory;
 
 import java.io.IOException;

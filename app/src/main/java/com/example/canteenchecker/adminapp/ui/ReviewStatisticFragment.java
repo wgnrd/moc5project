@@ -31,9 +31,7 @@ public class ReviewStatisticFragment extends Fragment {
   private static final String TAG = ReviewStatisticFragment.class.toString();
 
   public static Fragment create() {
-    ReviewStatisticFragment reviewStatisticFragment = new ReviewStatisticFragment();
-    Bundle arguments = new Bundle();
-    return reviewStatisticFragment;
+    return new ReviewStatisticFragment();
   }
 
   private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -67,7 +65,7 @@ public class ReviewStatisticFragment extends Fragment {
     prbRatingsFive = view.findViewById(R.id.prbRatingsFive);
 
     LocalBroadcastManager.getInstance(getActivity())
-            .registerReceiver(broadcastReceiver, Broadcasting.createCanteenChangedBroadcastIntentFilter());
+            .registerReceiver(broadcastReceiver, Broadcasting.createReviewsChangedBroadcastIntentFilter());
 
     updateReviewStatistics();
 
